@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Fantasy Kingdom Sandbox Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group span {
+            font-weight: 500;
+        }
+
+        .checkbox-group .description {
+            display: block;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 4px;
+            margin-left: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 8px;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #10b981, #059669);
+            color: white;
+            font-size: 16px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate:hover {
+            background: linear-gradient(to right, #059669, #047857);
+        }
+
+        .units-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .unit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        .unit-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .unit-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .unit-item select {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state p {
+            color: #9ca3af;
+        }
+
+        .empty-state p:first-child {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .info-box {
+            margin-top: 24px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .info-box h3 {
+            color: #60a5fa;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .info-box ol {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            color: #d1d5db;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        select option {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        /* Scrollbar styling */
+        .units-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .units-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .units-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .units-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>⚡ Super Fantasy Kingdom Sandbox Generator</h1>
+                <p>Create testing environments to experiment with unit and item interactions</p>
+            </div>
+
+            <div class="content">
+                <div id="successMessage" class="success-message">
+                    ✅ All 3 files generated successfully!
+                </div>
+
+                <!-- Sandbox Name -->
+                <div class="form-group">
+                    <label for="sandboxName">Sandbox Name</label>
+                    <input type="text" id="sandboxName" value="Test Sandbox" placeholder="My Test Environment">
+                </div>
+
+                <!-- Hero Selection -->
+                <div class="form-group">
+                    <label for="heroSelect">Select Hero</label>
+                    <select id="heroSelect">
+                        <option value="Thea">Thea</option>
+                        <option value="Rickard">Rickard</option>
+                        <option value="Cadus">Cadus</option>
+                        <option value="Grumdil">Grumdil</option>
+                        <option value="Selene">Selene</option>
+                        <option value="Mort">Mort</option>
+                        <option value="Gideon">Gideon</option>
+                        <option value="Sheva">Sheva</option>
+                        <option value="Alaric">Alaric</option>
+                        <option value="Cole">Cole</option>
+                        <option value="Qhela">Qhela</option>
+                    </select>
+                </div>
+
+                <!-- Max Resources -->
+                <div class="form-group">
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="maxResources" checked>
+                        <div>
+                            <span>Max Resources (999 of everything)</span>
+                            <span class="description">Capped wood, stone, food, coins, etc. for pure combat testing</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Units Section -->
+                <div class="form-group">
+                    <div class="section-header">
+                        <h3>Test Units</h3>
+                        <select id="addUnitSelect" class="btn btn-primary">
+                            <option value="">+ Add Unit</option>
+                        </select>
+                    </div>
+
+                    <div id="unitsList" class="units-list">
+                        <div class="empty-state">
+                            <p>No units added yet</p>
+                            <p>Use the dropdown above to add units to test</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item Section -->
+                <div class="form-group">
+                    <div class="section-header">
+                        <h3>Test Items</h3>
+                        <select id="addItemSelect" class="btn btn-primary">
+                            <option value="">+ Add Item</option>
+                        </select>
+                    </div>
+
+                    <div id="itemsList" class="units-list">
+                        <div class="empty-state">
+                            <p>No items added yet</p>
+                            <p>Use the dropdown above to add items to test</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <button id="generateBtn" class="btn btn-generate">
+                    <span>📥</span>
+                    Generate Sandbox Files (Challenge + Game + Kingdom)
+                </button>
+                <p class="footer-note">
+                    Downloads all 3 required files - place them in your game's challenge folder
+                </p>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3>How to Use</h3>
+            <ol>
+                <li>Choose your hero and add units and items you want to test</li>
+                <li>Click "Generate Sandbox Files" to download all 3 files (.challenge, .game, .kingdom)</li>
+                <li>Place all 3 files in your game's challenge folder (SteamLibrary\steamapps\common\Super Fantasy Kingdom\Super Fantasy Kingdom_Data\StreamingAssets\Challenges)</li>
+                <li>Load the challenge in-game and test your combinations!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const availableUnits = [
+            'Abomination', 'Angel', 'Archer', 'Ballista', 'Banshee', 'Bard', 'Bee', 'Beholder',
+            'Berserker', 'Brazier', 'Brute', 'Catapult', 'Colossus', 'Crossbowman', 'Cyclops',
+            'Dancer', 'DarkElemental', 'Deathpriest', 'Devil', 'Dinosaur', 'Druid', 'Dryad',
+            'FireElemental', 'FrostMage', 'Ghoul', 'Ghost', 'Griffin', 'Gremlin', 'Halfling',
+            'Headless', 'IceElemental', 'Jailer', 'Jester', 'Jouster', 'Leech', 'Lich',
+            'LightningElemental', 'Magus', 'Marksman', 'Mechanic', 'Mechwalker', 'Miner',
+            'Monk', 'Observer', 'Paladin', 'Palisade', 'Pixie', 'Psion', 'Rogue', 'Runescribe',
+            'Satyr', 'Shaman', 'Shroom', 'Skeleton', 'StormCaller', 'Succubus', 'Swordsman',
+            'Trebuchet', 'Treant', 'Troll', 'Vampire', 'WaterElemental', 'Werewolf', 'WindElemental',
+            'Yeti', 'Clown'
+        ];
+
+        const availableItems = [
+            'Amulet', 'Area', 'Armor', 'Axe', 'Barrier', 'Bow', 'Burn', 'Chalice', 'Cloverleaf', 'Coin bag',
+            'Cooldown', 'Courage', 'Duration', 'Fatigue', 'Freeze', 'Hammer', 'Health', 'Knife', 'Magnet', 'Mana',
+            'Piercing', 'Overshield', 'Radiance', 'Rage', 'Range', 'Rejuvenate', 'Resistance', 'Ring', 'Shield', 'Shock',
+            'Speed', 'Staff', 'Sword', 'Thorns', 'Tome', 'Wetness'
+        ];
+
+        const allHeroes = ['Rickard', 'Cadus', 'Grumdil', 'Selene', 'Mort', 'Gideon', 'Sheva', 'Alaric', 'Thea', 'Cole', 'Qhela'];
+
+        const gridPositions = [
+            {
+                index: 0,
+                position: 23
+            },
+            {
+                index: 1,
+                position: 13
+            },
+            {
+                index: 2,
+                position: 3
+            },
+            {
+                index: 3,
+                position: 33
+            },
+            {
+                index: 4,
+                position: 43
+            },
+            {
+                index: 5,
+                position: 4
+            },
+            {
+                index: 6,
+                position: 14
+            },
+            {
+                index: 7,
+                position: 24
+            },
+            {
+                index: 8,
+                position: 34
+            },
+            {
+                index: 9,
+                position: 44
+            },
+        ]
+
+        // State
+        let units = [];
+        let items = [];
+
+        // Populate unit dropdown
+        const addUnitSelect = document.getElementById('addUnitSelect');
+        availableUnits.forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit;
+            option.textContent = unit;
+            addUnitSelect.appendChild(option);
+        });
+
+        // Add unit handler
+        addUnitSelect.addEventListener('change', function() {
+            if (this.value) {
+                addUnit(this.value);
+                this.value = '';
+            }
+        });
+
+        function addUnit(unitName) {
+            const unit = {
+                name: unitName,
+                identifier: units.length + 1,
+                gridPosition: gridPositions.find(pos => pos.index == units.length + 1).position,
+                experience: 0,
+                rank: 0,
+                boost: false,
+                dead: false,
+                lastMeal: 10,
+                items: []
+            };
+            units.push(unit);
+            renderUnits();
+        }
+
+        function removeUnit(index) {
+            units.splice(index, 1);
+            renderUnits();
+        }
+
+        function renderUnits() {
+            const unitsList = document.getElementById('unitsList');
+            
+            if (units.length === 0) {
+                unitsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No units added yet</p>
+                        <p>Use the dropdown above to add units to test</p>
+                    </div>
+                `;
+                return;
+            }
+
+            unitsList.innerHTML = units.map((unit, index) => `
+                <div class="unit-item">
+                    <span class="unit-name">${unit.name}</span>
+                    <button class="btn btn-danger" onclick="removeUnit(${index})" title="Remove unit">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        // Populate item dropdown
+        const addItemSelect = document.getElementById('addItemSelect');
+        availableItems.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;
+            option.textContent = item;
+            addItemSelect.appendChild(option);
+        });
+
+        // Add item handler
+        addItemSelect.addEventListener('change', function() {
+            if (this.value) {
+                addItem(this.value);
+                this.value = '';
+            }
+        });
+
+        function addItem(itemName) {
+            const item = {
+                name: itemName,
+                position: {
+                    x: items.length,
+                    y: 0
+                }
+            };
+            items.push(item);
+            renderItems();
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItems();
+        }
+
+        function renderItems() {
+            const itemsList = document.getElementById('itemsList');
+            console.log('remdering')
+            if (items.length === 0) {
+                itemsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No items added yet</p>
+                        <p>Use the dropdown above to add items to test</p>
+                    </div>
+                `;
+                return;
+            }
+
+            itemsList.innerHTML = items.map((item, index) => `
+                <div class="unit-item">
+                    <span class="unit-name">${item.name}</span>
+                    <button class="btn btn-danger" onclick="removeItem(${index})" title="Remove item">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        // Generate sandbox
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const sandboxName = document.getElementById('sandboxName').value;
+            const selectedHero = document.getElementById('heroSelect').value;
+            const maxResources = document.getElementById('maxResources').checked;
+            
+            generateSandbox(sandboxName, selectedHero, maxResources);
+        });
+
+        function generateSandbox(sandboxName, selectedHero, maxResources) {
+            const resourceAmount = maxResources ? 999 : 0;
+            const filename = sandboxName.replace(/\s+/g, '_');
+
+            // 1. Create challenge file
+            const challenge = {
+                title: sandboxName,
+                description: "Sandbox for testing units and items",
+                author: "Sandbox Generator",
+                kingdom: 0,
+                difficultyLevel: 1,
+                shardReward: 0,
+                requiredGlory: 50,
+                winOnDay: 14,
+                canBuildRoads: true,
+                guardMode: true,
+                priorityMode: true,
+                guestHermit: 2,
+                guestMerchant: 5,
+                guestMonsterHunter: 6,
+                guestWitchDoctor: 4,
+                guestGnomes: 28,
+                guestDemolisher: 13,
+                guestCaravan: 20,
+                guestBuilder: 19,
+                guestWizard: 23,
+                guestResearcher: 26,
+                unlockedUnits: availableUnits,
+                unlockedUnitsPassive: availableUnits,
+                bannedBuildings: [],
+                folder: "",
+                official: false
+            };
+
+            // 2. Create hero unit
+            const heroUnit = {
+                name: selectedHero,
+                identifier: 0,
+                gridPosition: 23,
+                experience: 0,
+                rank: 0,
+                boost: false,
+                dead: false,
+                lastMeal: 10,
+                items: []
+            };
+
+            // 3. Create game state
+            const gameState = {
+                version: 1,
+                started: "0.4.934",
+                kingdom: 0,
+                curse: 0,
+                day: 1,
+                glory: 999,
+                buildings: [{
+                    name: "HumanCastle",
+                    type: 0,
+                    position: { x: 0.0, y: -15.0 },
+                    resources: [
+                        { type: 2, amount: resourceAmount },
+                        { type: 3, amount: resourceAmount },
+                        { type: 4, amount: resourceAmount },
+                        { type: 15, amount: resourceAmount },
+                        { type: 16, amount: resourceAmount },
+                        { type: 10, amount: resourceAmount },
+                        { type: 31, amount: resourceAmount },
+                        { type: 45, amount: resourceAmount },
+                        { type: 46, amount: resourceAmount },
+                        { type: 47, amount: resourceAmount },
+                        { type: 48, amount: resourceAmount },
+                        { type: 49, amount: resourceAmount },
+                        { type: 51, amount: resourceAmount },
+                        { type: 50, amount: resourceAmount },
+                        { type: 52, amount: resourceAmount },
+                        { type: 53, amount: resourceAmount }
+                    ],
+                    isUpgraded: 0,
+                    isUpgradeActive: true,
+                    isBoosted: false,
+                    jobAmount: 0,
+                    currentlyCrafting: -1,
+                    usages: 0,
+                    taxes: -1,
+                    progress: 0,
+                    queue: []
+                }],
+                cityEvents: [
+                    0,
+                    12,
+                    13,
+                    13,
+                    12,
+                    12,
+                    12,
+                    8,
+                    2,
+                    4
+                ],
+                units: [heroUnit, ...units],
+                repairableBuildings: [],
+                depletableResources: [],
+                animals: [],
+                worldResources: [],
+                worldMonsters: [],
+                world: [
+                    {
+                        name: "SuperPortal",
+                        position: {
+                            x: 46.0,
+                            y: -15.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "QuestShards",
+                        position: {
+                            x: 0.0,
+                            y: 31.0
+                        },
+                        data: [
+                            900,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "QuestShield",
+                        position: {
+                            x: -23.0,
+                            y: -9.0
+                        },
+                        data: [
+                            6500,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "FoodMarket",
+                        position: {
+                            x: 28.0,
+                            y: 4.0
+                        },
+                        data: [
+                            2,
+                            9,
+                            3
+                        ]
+                    },
+                    {
+                        name: "BlackMarket",
+                        position: {
+                            x: 54.0,
+                            y: 31.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "SiegeMarket",
+                        position: {
+                            x: -30.0,
+                            y: -13.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesCarrier",
+                        position: {
+                            x: -38.0,
+                            y: -16.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesCarrier2",
+                        position: {
+                            x: 55.0,
+                            y: -10.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingWorker4",
+                        position: {
+                            x: -10.0,
+                            y: 39.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesBanish",
+                        position: {
+                            x: -50.0,
+                            y: -16.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesFish",
+                        position: {
+                            x: 39.0,
+                            y: 12.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingWorker2",
+                        position: {
+                            x: -37.0,
+                            y: 22.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesWorker",
+                        position: {
+                            x: 32.0,
+                            y: 5.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "PrisonDungeon",
+                        position: {
+                            x: 40.0,
+                            y: 38.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            -1,
+                            -1
+                        ]
+                    },
+                    {
+                        name: "SnakeDungeon",
+                        position: {
+                            x: -31.0,
+                            y: -22.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            -1,
+                            -1
+                        ]
+                    },
+                    {
+                        name: "DoctorRepaired",
+                        position: {
+                            x: 9.7180004119873047,
+                            y: -5.3600001335144043
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "QuestChurch",
+                        position: {
+                            x: 29.0,
+                            y: 17.0
+                        },
+                        data: [
+                            3200,
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanDefender",
+                        position: {
+                            x: -12.0,
+                            y: -3.0
+                        },
+                        data: [
+                            4,
+                            1
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanCrossbowman",
+                        position: {
+                            x: 21.0,
+                            y: -7.0
+                        },
+                        data: [
+                            2,
+                            1
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanMonk",
+                        position: {
+                            x: 37.0,
+                            y: 8.0
+                        },
+                        data: [
+                            7,
+                            1
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanJouster",
+                        position: {
+                            x: -20.0,
+                            y: 38.0
+                        },
+                        data: [
+                            15,
+                            0
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanBard",
+                        position: {
+                            x: -43.0,
+                            y: 20.0
+                        },
+                        data: [
+                            17,
+                            0
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanGriffin",
+                        position: {
+                            x: 29.0,
+                            y: -23.0
+                        },
+                        data: [
+                            11,
+                            0
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanPaladin",
+                        position: {
+                            x: -26.0,
+                            y: -15.0
+                        },
+                        data: [
+                            12,
+                            0
+                        ]
+                    },
+                    {
+                        name: "BuildingHumanAngel",
+                        position: {
+                            x: 4.0,
+                            y: 25.0
+                        },
+                        data: [
+                            13,
+                            1
+                        ]
+                    },
+                    {
+                        name: "OutsideQuarry",
+                        position: {
+                            x: -26.0,
+                            y: -25.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "OutsideFarm",
+                        position: {
+                            x: 34.0,
+                            y: 14.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "OutsideWood",
+                        position: {
+                            x: -34.0,
+                            y: 30.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "OutsideMine",
+                        position: {
+                            x: 53.0,
+                            y: 38.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "StartingIngot",
+                        position: {
+                            x: -45.0,
+                            y: -2.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingMeat",
+                        position: {
+                            x: 55.0,
+                            y: 24.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "StartingWheat",
+                        position: {
+                            x: 11.513999938964844,
+                            y: 30.468000411987305
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "TrainingGrounds",
+                        position: {
+                            x: -43.0,
+                            y: -10.0
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "Pirates",
+                        position: {
+                            x: 10.5,
+                            y: -20.5
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "Witch",
+                        position: {
+                            x: 100.0,
+                            y: 100.0
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "MerchantRepaired",
+                        position: {
+                            x: -39.520000457763672,
+                            y: 3.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "Wonder",
+                        position: {
+                            x: -43.0,
+                            y: -23.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "KingdomShop",
+                        position: {
+                            x: -26.0,
+                            y: 14.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "DemolisherRepaired",
+                        position: {
+                            x: -29.319999694824219,
+                            y: 21.190000534057617
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "RandomItem",
+                        position: {
+                            x: -49.0,
+                            y: 10.25
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "Tailor",
+                        position: {
+                            x: -41.0,
+                            y: 27.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "TradingPost",
+                        position: {
+                            x: -42.0,
+                            y: 4.0
+                        },
+                        data: [
+                            3,
+                            1,
+                            7
+                        ]
+                    },
+                    {
+                        name: "Hospital",
+                        position: {
+                            x: -13.0,
+                            y: 22.75
+                        },
+                        data: [
+                            0,
+                            -1
+                        ]
+                    },
+                    {
+                        name: "Guild",
+                        position: {
+                            x: 3.0,
+                            y: 29.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "WorldMonsterHunter",
+                        position: {
+                            x: -37.25,
+                            y: -8.75
+                        },
+                        data: [
+                        ]
+                    },
+                    {
+                        name: "BlacksmithForge",
+                        position: {
+                            x: -29.0,
+                            y: -5.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "GnomesRepaired",
+                        position: {
+                            x: -25.0,
+                            y: 33.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "WizardTower",
+                        position: {
+                            x: 1.0,
+                            y: 37.25
+                        },
+                        data: [
+                            0
+                        ]
+                    },
+                    {
+                        name: "WizardRepaired",
+                        position: {
+                            x: 2.0,
+                            y: 35.9375
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "EveDungeon",
+                        position: {
+                            x: -47.0,
+                            y: 16.5
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            -1,
+                            -1
+                        ]
+                    },
+                    {
+                        name: "BuilderRepaired",
+                        position: {
+                            x: 28.0,
+                            y: -19.0
+                        },
+                        data: [
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "Cartographer",
+                        position: {
+                            x: 25.0,
+                            y: 13.0
+                        },
+                        data: [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ]
+                    },
+                    {
+                        name: "RoadButton(Clone)",
+                        position: {
+                            x: -50.0,
+                            y: -2.0
+                        },
+                        data: [
+                        ]
+                    }
+                ],
+                backpack: items,
+                bannedUnits: ["empty", "empty", "empty"],
+                gloryMultiplier: 1.0,
+                experience: 0,
+                faith: 100,
+                happiness: 10,
+                faithSkills: [],
+                resources: [
+                    { type: 27, amount: resourceAmount },
+                    { type: 5, amount: resourceAmount },
+                    { type: 31, amount: resourceAmount },
+                    { type: 11, amount: resourceAmount },
+                    { type: 33, amount: resourceAmount },
+                    { type: 17, amount: resourceAmount }
+                ],
+                cook: 0,
+                coins: 99,
+                revivals: 10,
+                drinks: 99,
+                geologistBonus: 0,
+                chestsCraftedAmount: 0,
+                seed: Math.floor(Math.random() * 10000000),
+                wallHitPoints: 0,
+                playtime: 0,
+                weather: -1,
+                lastWeather: 0,
+                isNight: false,
+                nextUnitIdentifier: units.length + 1,
+                upgradesAmount: 0,
+                monsterAlignment: 0,
+                priority: 0,
+                banCarrier: 0,
+                taxMode: 12,
+                lastPlayed: "-8584406063618295394",
+                challenge: "",
+                hash: "",
+                flag: { x: 0, y: 0, z: 0 },
+                king: { x: -1, y: -18, z: 0 },
+                upgradedWorkers: 0,
+                upgradedCarriers: 0,
+                unlockedUnitSpots: [24, 13, 33, 43, 14, 3, 23, 22, 21],
+                kingdomBuildings: [],
+                freeSpaces: [],
+                heroPowerUps: [],
+                monsters: [],
+                relics: [],
+                tracksStone: [],
+                tracksOre: [],
+                upgradedRoads: [],
+                spokenToThisWeek: [100, 1, 51, 11, 80, 13, 10, 80],
+                dailyStatistic: createEmptyStatistics(),
+                totalStatistics: createEmptyStatistics()
+            };
+
+            // 4. Create maxed kingdom file
+            const kingdom = {
+                version: 1,
+                experience: 170,
+                crowns: 999,
+                hero: selectedHero,
+                item: "Vision",
+                unit: "Jouster",
+                shards: 999,
+                superMetal: 999,
+                coins: 999,
+                faith: 999,
+                booster: 0,
+                totalBeaten: 0,
+                totalWins: 0,
+                totalStarts: 0,
+                totalRuns: 0,
+                totalDays: 0,
+                totalKills: 0,
+                maxDay: 28,
+                maxDayLastRun: 1,
+                maxGlory: 1500,
+                maxCurse: 6,
+                tutorialTask: 12,
+                curse: 0,
+                banishes: 0,
+                retry: false,
+                retries: 0,
+                starters: [0, 3, 3, 1, 0],
+                jail1: "empty",
+                jail2: "empty",
+                jail3: "empty",
+                guestWeek1: 80,
+                guestWeek2: 0,
+                guestWeek3: 80,
+                guestWeek4: 40,
+                boardTasksToReroll: 5,
+                boardDefenseTask: 11,
+                boardDefenseProgress: 1.0,
+                boardCombatTask: 9,
+                boardCombatProgress: 402.0,
+                boardCityTask: 8,
+                boardCityProgress: 0.0,
+                beaten: ["Blob"],
+                heroesFound: allHeroes,
+                heroesUnlocked: allHeroes.filter(i => i !== 'Rickard'),
+                passivesUnlocked: availableUnits,
+                unitsUnlocked: availableUnits,
+                unitsPlayed: availableUnits,
+                itemsWon: availableItems,
+                roads: [
+                    "d1f7f228-2de0-41a3-9d3f-475b7057b585",
+                    "2f2d86ee-9d91-495e-9c5c-3b74df5f1b61",
+                    "39399f85-aeec-4dc4-b910-73e4577c7fc3",
+                    "3766e6b8-6077-404b-a4f9-57e66c3185db",
+                    "3766e6b8-6077-404b-a4f9-57e6fsdf85db",
+                    "1f6cb246-09b0-4bd4-8510-eed286e98578",
+                    "5ec873d7-d407-47f2-9a25-daf235144ba8",
+                    "18fb72bc-d5b4-493d-90f6-3a0640ce6f29",
+                    "9298930b-8a13-436c-857b-c6d6f87a03f8",
+                    "462eb4a9-9022-4ede-8a89-b00eb3768f42",
+                    "1207f847-c1ea-4790-a4fd-0eab5edb75c1",
+                    "4936a5ce-4bd0-4693-97de-c997576c3ae4",
+                    "e604ff32-710e-477d-9e3f-142555172ee8",
+                    "921d72a1-b029-4cf6-842d-61f209afe190",
+                    "2f10b2ea-d590-4dfa-ae13-5e49d1d5f6c0",
+                    "6186a5d7-a57e-42a6-85b9-ba563ee9c7eb",
+                    "f5bd0d39-a33a-488a-8dfc-40df2ecfc5e1",
+                    "44b28a34-de2d-4275-b775-dfc420fcd822",
+                    "25ec90af-0405-4c92-8906-575331846b16",
+                    "1d15afde-e428-4da1-9336-bbacef19926d",
+                    "fa25e3b6-16cd-4e7a-8bd2-e2e4de67a425",
+                    "9f2a2587-9503-4bfa-a207-8840963e1dd5",
+                    "8b9592e8-fcaf-4aff-bdb8-ee5d3793eb39",
+                    "77836a0e-e4bf-45cb-a5b7-0cb9ddd559b4",
+                    "a5be382b-2489-4127-932c-45ed79069b99",
+                    "859229cd-df01-4345-94c5-f255678b9749",
+                    "9a2de93d-0573-4814-ae07-4da6673d4bed"
+                ],
+                worldBuildings: [
+                    "DestroyableBush",
+                    "MerchantDamagedWagon",
+                    "PrioritySystem",
+                    "BlacksmithStranger",
+                    "BlacksmithWantsForge",
+                    "Boulder",
+                    "Boulder.1",
+                    "Sword",
+                    "Demolisher",
+                    "PiratesDamagedShip",
+                    "GnomesDestroyed",
+                    "WizardDestroyed",
+                    "Building",
+                    "MioMode",
+                    "WizardMonsterHunterWorldDialogue",
+                    "Builder",
+                    "OraclePay",
+                    "DestroyableShards",
+                    "Shards1",
+                    "Shards2",
+                    "Shards3",
+                    "BuilderDestroyed",
+                    "DemolisherDestroyed",
+                    "CartographerPay",
+                    "TheaQuestFirst",
+                    "DemolisherBoulderWorldDialogue",
+                    "Key",
+                    "GideonQuestFirst",
+                    "GideonQuestSecond",
+                    "GideonQuestThird",
+                    "TheaQuestFourth",
+                    "GideonQuestFourth",
+                    "TheaQuestSecond",
+                    "TheaQuestThird",
+                    "BlacksmithBoulderWorldDialogue",
+                    "GateClosed",
+                    "WitchTreeStumpWorldDialogue",
+                    "DestroyableSuperMetal5",
+                    "DestroyableSuperMetal3",
+                    "DestroyableSuperMetal1",
+                    "DestroyableSuperMetal2",
+                    "DestroyableSuperMetal4",
+                    "DestroyableSuperMetal6",
+                    "DestroyableSuperMetal7",
+                    "EndBossHome"
+                ],
+                dialogData: [],
+                worldSpotResourceData: [],
+                armory: [],
+                variousData: [
+                    {
+                        name: "StartingResourcesWorker",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "WitchDoctor",
+                        data: [
+                            7
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesFish",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesCarrier",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingWorker2",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingMeat",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingResourcesBanish",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "clouds",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingWorker3",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "StartingWheat",
+                        data: [
+                            1
+                        ]
+                    },
+                    {
+                        name: "Witch",
+                        data: [
+                            7
+                        ]
+                    },
+                    {
+                        name: "StartingWorker4",
+                        data: [
+                            1
+                        ]
+                    }
+                ],
+                raceEvents: [
+                    120,
+                    140,
+                    60,
+                    61,
+                    1003,
+                    3,
+                    6,
+                    1,
+                    80,
+                    4,
+                    91,
+                    92,
+                    81,
+                    20,
+                    93,
+                    94,
+                    24,
+                    1005,
+                    21,
+                    22,
+                    23,
+                    2,
+                    95,
+                    40,
+                    180,
+                    220,
+                    1004,
+                    7,
+                    221,
+                    222,
+                    96,
+                    97,
+                    182,
+                    181,
+                    200,
+                    201,
+                    160,
+                    161,
+                    162,
+                    1006,
+                    82,
+                    1007,
+                    8,
+                    90,
+                    121,
+                    163,
+                    164,
+                    11,
+                    231,
+                    232,
+                    12,
+                    250,
+                    251,
+                    510,
+                    14,
+                    13,
+                    500,
+                    501,
+                    502,
+                    513,
+                    511,
+                    512,
+                    10
+                ]
+            };
+
+            // Download all 3 files
+            downloadFile(challenge, `${filename}.challenge`);
+            setTimeout(() => {
+                downloadFile(gameState, `${filename}.game`);
+                setTimeout(() => {
+                    downloadFile(kingdom, `${filename}.kingdom`);
+                    // Show success message
+                    const successMsg = document.getElementById('successMessage');
+                    successMsg.classList.add('show');
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 3000);
+                }, 100);
+            }, 100);
+        }
+
+        function createEmptyStatistics() {
+            return {
+                deathCount: Array(30).fill(0),
+                killCount: Array(30).fill(0),
+                damageMeter: Array(30).fill(0),
+                healMeter: Array(30).fill(0),
+                defenseMeter: Array(30).fill(0),
+                killedAmount: 0,
+                defendedAmount: 0,
+                deathsAmount: 0,
+                hungryAmount: 0,
+                totalShards: 0,
+                totalFaith: 0,
+                totalCoins: 0,
+                geologistsDigsAmount: 0,
+                portalsOpenedAmount: 0,
+                relicReceivedAmount: 0
+            };
+        }
+
+        function downloadFile(data, filename) {
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        renderUnits();
+    </script>
+</body>
+</html>
