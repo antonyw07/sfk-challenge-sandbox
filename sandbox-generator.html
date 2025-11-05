@@ -334,6 +334,23 @@
                     </label>
                 </div>
 
+                <!-- Relic Section -->
+                <div class="form-group">
+                    <div class="section-header">
+                        <h3>Test Relics</h3>
+                        <select id="addRelicSelect" class="btn btn-primary">
+                            <option value="">+ Add Relic</option>
+                        </select>
+                    </div>
+
+                    <div id="relicsList" class="units-list">
+                        <div class="empty-state">
+                            <p>No relics added yet</p>
+                            <p>Use the dropdown above to add relics to test</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Units Section -->
                 <div class="form-group">
                     <div class="section-header">
@@ -412,6 +429,23 @@
             'Piercing', 'Overshield', 'Radiance', 'Rage', 'Range', 'Rejuvenate', 'Resistance', 'Ring', 'Shield', 'Shock',
             'Speed', 'Staff', 'Sword', 'Thorns', 'Tome', 'Wetness'
         ];
+        
+        const availableRelics = [
+            "Acid", "Bait", "Berry Bread", "Better Berries", "Blind Love", "Blood Poisoning", "Bloody Knife", "Booze",
+            "Bush", "Bush of Life", "Burning Book", "Charge", "Conductor", "Cookies", "Cover Fire", "Crimson Heart",
+            "Deforestation", "Destiny", "Dice", "Disease", "Duck", "Eagle Eye", "Eclipse", "Enlightenment",
+            "Fangs", "Feasting", "Fields of Glory", "Fire in a Bottle", "Fire Shield", "Fish Filet", "Fishing Net",
+            "Fishing Rod", "Flame Shock", "Frost Arrows", "Gas Cloud", "Glasses", "Gold Digger", "Greatshield",
+            "Greenhouse", "Hellfire", "Hidden Blade", "Holy Water", "Honey Dipper", "Hourglass", "Hurry",
+            "Hungry Shield", "Hydro Power", "Ice Breaker", "Knock Knock", "Lacerate", "Lightning Rod",
+            "Lute", "Madness", "Magic Beans", "Metal Arrows", "Metal Mage", "Mug of Joy", "Necronomicon",
+            "Ore", "Polishing", "Prohibition", "Punch", "Ragefire Gauntlet", "Rock", "Sacrificaial Tablet",
+            "Scissors", "Scroll of Darkness", "Scroll of Fire", "Scroll of Ice", "Scroll of Thunder",
+            "Scroll of Water", "Sleep Powder", "Slippery Slope", "Snow Globe", "Soup", "Staff of Life",
+            "Thick Skin", "Thorny Whip", "Tree", "Unique Horn", "Unholy Aura", "Viper's Kiss", "Weak Spot",
+            "Wilderness", "Wrench"
+        ];
+
 
         const allHeroes = ['Rickard', 'Cadus', 'Grumdil', 'Selene', 'Mort', 'Gideon', 'Sheva', 'Alaric', 'Thea', 'Cole', 'Qhela'];
 
@@ -459,8 +493,57 @@
         ]
 
         // State
+        let relics = [];
         let units = [];
         let items = [];
+
+        // Populate relic dropdown
+        const addRelicSelect = document.getElementById('addRelicSelect');
+        availableRelics.forEach(relic => {
+            const option = document.createElement('option');
+            option.value = relic;
+            option.textContent = relic;
+            addRelicSelect.appendChild(option);
+        });
+
+        // Add unit handler
+        addRelicSelect.addEventListener('change', function() {
+            if (this.value) {
+                addRelic(this.value);
+                this.value = '';
+            }
+        });
+
+        function addRelic(relicName) {
+            relics.push(relicName);
+            renderRelics();
+        }
+
+        function removeRelic(index) {
+            relics.splice(index, 1);
+            renderRelics();
+        }
+
+        function renderRelics() {
+            const relicsList = document.getElementById('relicsList');
+            
+            if (relics.length === 0) {
+                relicsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No relics added yet</p>
+                        <p>Use the dropdown above to add relics to test</p>
+                    </div>
+                `;
+                return;
+            }
+
+            relicsList.innerHTML = relics.map((relic, index) => `
+                <div class="unit-item">
+                    <span class="unit-name">${relic}</span>
+                    <button class="btn btn-danger" onclick="removeRelic(${index})" title="Remove relic">🗑️</button>
+                </div>
+            `).join('');
+        }
 
         // Populate unit dropdown
         const addUnitSelect = document.getElementById('addUnitSelect');
@@ -1315,7 +1398,7 @@
                 freeSpaces: [],
                 heroPowerUps: [],
                 monsters: [],
-                relics: [],
+                relics: relics,
                 tracksStone: [],
                 tracksOre: [],
                 upgradedRoads: [],
