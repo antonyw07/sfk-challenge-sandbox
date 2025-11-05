@@ -58,6 +58,6 @@ Explain any core workflow:
 
 ### ## 📄 License
 
-MIT License (or whatever license you prefer)
+MIT License
 
 ---
